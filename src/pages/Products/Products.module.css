@@ -1,0 +1,225 @@
+.productsPage {
+  padding: 30px 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.titleSection {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.pageTitle {
+  margin: 0;
+  font-size: 2rem;
+  color: #00d4ff;
+}
+
+.pageSubtitle {
+  margin: 5px 0 0 0;
+  opacity: 0.8;
+  font-size: 1.1rem;
+}
+
+.addProductBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(45deg, #00d4ff, #00ff88);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.addProductBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+}
+
+.searchSection {
+  margin-bottom: 30px;
+}
+
+.searchContainer {
+  position: relative;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.searchInput {
+  width: 100%;
+  padding: 15px 20px 15px 50px;
+  font-size: 1.1rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.searchInput:focus {
+  border-color: #00d4ff;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+}
+
+.productsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 25px;
+}
+
+.productCard {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 25px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.productCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+}
+
+.productImage {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.productInfo {
+  margin-bottom: 20px;
+}
+
+.productName {
+  margin: 0 0 10px 0;
+  font-size: 1.3rem;
+  color: #ffffff;
+}
+
+.productDescription {
+  margin: 0 0 15px 0;
+  opacity: 0.7;
+  line-height: 1.5;
+}
+
+.productDetails {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.productPrice {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #00ff88;
+}
+
+.productBarcode {
+  opacity: 0.6;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.productActions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.addToCartBtn {
+  flex: 1;
+  padding: 12px;
+  background: linear-gradient(45deg, #00d4ff, #00ff88);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.addToCartBtn:hover {
+  transform: translateY(-2px);
+}
+
+.actionButtons {
+  display: flex;
+  gap: 5px;
+}
+
+.editBtn,
+.deleteBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.editBtn {
+  border: 1px solid #00d4ff;
+  color: #00d4ff;
+}
+
+.editBtn:hover {
+  background: rgba(0, 212, 255, 0.1);
+}
+
+.deleteBtn {
+  border: 1px solid #ff4757;
+  color: #ff4757;
+}
+
+.deleteBtn:hover {
+  background: rgba(255, 71, 87, 0.1);
+}
+
+.noResults {
+  text-align: center;
+  padding: 60px 20px;
+  opacity: 0.6;
+}
+
+.noResults h3 {
+  margin: 20px 0 10px 0;
+  font-size: 1.5rem;
+}
+
+.noResults p {
+  margin: 0;
+  opacity: 0.8;
+}
