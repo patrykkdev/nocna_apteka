@@ -1,11 +1,8 @@
 .navbar {
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 15px 0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  background: #ffffff;
+  border-bottom: 3px solid #2c5530;
+  padding: 16px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .container {
@@ -23,15 +20,17 @@
 
 .title {
   margin: 0;
-  font-size: 1.5rem;
-  background: linear-gradient(45deg, #00d4ff, #00ff88);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 1.6rem;
+  color: #2c5530;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .navigation {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex: 2;
   justify-content: center;
 }
@@ -40,24 +39,29 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
-  color: rgba(255, 255, 255, 0.7);
+  padding: 12px 20px;
+  color: #6c757d;
   text-decoration: none;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  border-radius: 6px;
+  transition: all 0.2s ease;
   font-weight: 500;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
 }
 
 .navLink:hover {
-  color: #00d4ff;
-  background: rgba(0, 212, 255, 0.1);
+  color: #2c5530;
+  background: #e8f5e8;
+  border-color: #2c5530;
   transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(44, 85, 48, 0.2);
 }
 
 .navLink.active {
-  color: #00ff88;
-  background: rgba(0, 255, 136, 0.1);
-  border: 1px solid rgba(0, 255, 136, 0.3);
+  color: #ffffff;
+  background: #198754;
+  border-color: #198754;
+  box-shadow: 0 2px 4px rgba(25, 135, 84, 0.3);
 }
 
 .cartInfo {
@@ -66,18 +70,20 @@
   gap: 8px;
   flex: 1;
   justify-content: flex-end;
-  color: #00ff88;
+  color: #198754;
+  font-weight: 600;
 }
 
 .cartCount {
-  background: #00ff88;
-  color: #000;
+  background: #198754;
+  color: #ffffff;
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 0.8rem;
-  font-weight: bold;
+  font-weight: 700;
   min-width: 20px;
   text-align: center;
+  box-shadow: 0 2px 4px rgba(25, 135, 84, 0.3);
 }
 
 @media (max-width: 768px) {
@@ -89,13 +95,22 @@
   .navigation {
     order: 2;
     flex-wrap: wrap;
+    gap: 6px;
   }
 
   .cartInfo {
     order: 1;
   }
 
+  .navLink {
+    padding: 10px 14px;
+  }
+
   .navLink span {
     display: none;
+  }
+
+  .title {
+    font-size: 1.4rem;
   }
 }

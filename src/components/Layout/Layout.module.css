@@ -1,8 +1,8 @@
 .layout {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  color: #ffffff;
-  font-family: system-ui, -apple-system, sans-serif;
+  background: #f8f9fa;
+  color: #1e293b;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .container {
@@ -16,6 +16,13 @@
   grid-template-columns: 1fr 400px;
   gap: 30px;
   align-items: start;
+}
+
+/* Pełna szerokość dla strony skanera */
+.contentFullWidth {
+  display: block;
+  width: 100%;
+  padding: 0;
 }
 
 .main {

@@ -125,7 +125,19 @@ export const initializeProducts = async () => {
       {
         name: "Vitamin C 1000mg",
         price: 24.99,
-        barcode: "2345678901234",
+        barcode: "4752224002761",
+        image:
+          "https://images.unsplash.com/photo-1550572017-edd951aa8ca6?w=200&h=200&fit=crop",
+        description:
+          "Suplement diety z witaminą C wspierający układ odpornościowy.",
+        category: "Suplementy",
+        stock: 89,
+        expiry: "2025-06-30",
+      },
+      {
+        name: "Vitamin C 1000mg",
+        price: 24.99,
+        barcode: "4752224002761",
         image:
           "https://images.unsplash.com/photo-1550572017-edd951aa8ca6?w=200&h=200&fit=crop",
         description:

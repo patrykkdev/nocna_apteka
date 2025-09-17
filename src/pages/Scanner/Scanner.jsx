@@ -13,7 +13,15 @@ const Scanner = () => {
   const inputRef = useRef(null);
   const lastScanTimeRef = useRef(0);
 
-  const { addToCart, showNotification, cartItems } = useCart();
+  const {
+    addToCart,
+    showNotification,
+    cart,
+    updateQuantity,
+    removeFromCart,
+    getTotalPrice,
+    getTotalItems,
+  } = useCart();
 
   // Global keydown handler dla skanera HID
   useEffect(() => {
@@ -42,17 +50,17 @@ const Scanner = () => {
 
   // Aktualizuj listę zeskanowanych produktów na podstawie koszyka
   useEffect(() => {
-    if (cartItems && Array.isArray(cartItems)) {
-      const productsFromCart = cartItems.map((item) => ({
+    if (cart && Array.isArray(cart)) {
+      const productsFromCart = cart.map((item) => ({
         ...item,
-        id: item.id,
+        id: item.barcode, // użyj barcode jako ID dla kompatybilności
         totalPrice: item.price * item.quantity,
       }));
       setScannedProducts(productsFromCart);
     } else {
       setScannedProducts([]);
     }
-  }, [cartItems]);
+  }, [cart]);
 
   const performScan = async (barcode) => {
     const now = Date.now();
@@ -64,9 +72,14 @@ const Scanner = () => {
     setIsScanning(true);
 
     try {
+      console.log("🔍 Szukam produktu dla kodu:", barcode);
+      console.log("📏 Długość kodu:", barcode.length);
+      console.log("🔢 Kod jako liczba:", parseInt(barcode));
+
       const product = await getProductByBarcode(barcode.trim());
 
       if (product) {
+        console.log("✅ Znaleziony produkt:", product);
         await addToCart(product);
         setLastScanned(product.name);
 
@@ -81,13 +94,41 @@ const Scanner = () => {
         // Ukryj komunikat po 3 sekundach
         setTimeout(() => setLastScanned(""), 3000);
       } else {
+        console.log("❌ Nie znaleziono produktu dla kodu:", barcode);
         showNotification(`Nie znaleziono produktu: ${barcode}`);
+
+        // Sprawdź czy to może być problem z formatem
+        console.log("🔍 Próbuję różnych formatów kodu...");
+        const variations = [
+          barcode.padStart(13, "0"), // EAN-13 z zerami na początku
+          barcode.replace(/^0+/, ""), // Usuń zera na początku
+          String(parseInt(barcode)), // Jako liczba bez zer wiodących
+        ];
+
+        for (const variation of variations) {
+          console.log("🔄 Sprawdzam wariant:", variation);
+          const variantProduct = await getProductByBarcode(variation);
+          if (variantProduct) {
+            console.log(
+              "✅ Znaleziony przez wariant:",
+              variation,
+              variantProduct
+            );
+            await addToCart(variantProduct);
+            setLastScanned(variantProduct.name);
+            playBeepSound();
+            setTimeout(() => setLastScanned(""), 3000);
+            return;
+          }
+        }
+
+        console.log("❌ Żaden wariant nie zadziałał");
       }
     } catch (error) {
-      console.error("Błąd skanowania:", error);
+      console.error("💥 Błąd skanowania:", error);
       showNotification("Błąd podczas skanowania");
     } finally {
-      setScanInput("");
+      setBuffer("");
       setIsScanning(false);
     }
   };
@@ -112,70 +153,39 @@ const Scanner = () => {
     }
   };
 
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    setScanInput(value);
-
-    if (!autoScanEnabled) return;
-
-    if (scanTimeoutRef.current) {
-      clearTimeout(scanTimeoutRef.current);
-    }
-
-    if (value.length >= minBarcodeLength) {
-      scanTimeoutRef.current = setTimeout(() => {
-        performScan(value);
-      }, scanDelay);
-    }
-  };
-
-  const updateQuantity = (productId, change) => {
-    const product = scannedProducts.find((p) => p.id === productId);
+  const handleUpdateQuantity = async (productBarcode, change) => {
+    const product = scannedProducts.find((p) => p.barcode === productBarcode);
     if (!product) return;
 
     if (change > 0) {
-      addToCart(product);
+      await addToCart(product);
     } else {
-      // Tutaj powinna być funkcja removeFromCart, ale używamy workaround
-      // Możesz dodać tę funkcję do CartContext jeśli jej nie ma
-      const updatedProducts = scannedProducts
-        .map((p) =>
-          p.id === productId
-            ? { ...p, quantity: Math.max(0, p.quantity - 1) }
-            : p
-        )
-        .filter((p) => p.quantity > 0);
-
-      setScannedProducts(updatedProducts);
+      const newQuantity = product.quantity - 1;
+      if (newQuantity > 0) {
+        await updateQuantity(productBarcode, newQuantity);
+      } else {
+        await removeFromCart(productBarcode);
+      }
     }
   };
 
-  const removeProduct = (productId) => {
-    setScannedProducts((prev) => prev.filter((p) => p.id !== productId));
+  const handleRemoveProduct = async (productBarcode) => {
+    await removeFromCart(productBarcode);
   };
 
-  const getTotalPrice = () => {
-    return scannedProducts.reduce(
-      (total, product) => total + product.price * product.quantity,
-      0
-    );
-  };
-
-  const getTotalItems = () => {
-    return scannedProducts.reduce(
-      (total, product) => total + product.quantity,
-      0
-    );
-  };
-
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (scannedProducts.length === 0) return;
 
+    const totalPrice = getTotalPrice();
     showNotification(
-      `Zamówienie na kwotę ${getTotalPrice().toFixed(2)} zł zostało złożone!`
+      `Zamówienie na kwotę ${totalPrice.toFixed(2)} zł zostało złożone!`
     );
+
     // Tutaj dodaj logikę realizacji zamówienia
     console.log("Realizacja zamówienia:", scannedProducts);
+
+    // Opcjonalnie wyczyść koszyk po złożeniu zamówienia
+    // await clearCart();
   };
 
   return (
@@ -215,7 +225,7 @@ const Scanner = () => {
               size={32}
               style={{ verticalAlign: "middle", marginRight: "10px" }}
             />
-            Skaner Produktów
+            Produkty
           </h1>
           <p className={styles.scannerSubtitle}>
             Zeskanuj kod kreskowy produktu
@@ -228,14 +238,14 @@ const Scanner = () => {
               <h2>🛒 Zeskanowane produkty ({getTotalItems()})</h2>
               <div className={styles.productsList}>
                 {scannedProducts.map((product) => (
-                  <div key={product.id} className={styles.productItem}>
+                  <div key={product.barcode} className={styles.productItem}>
                     <img
                       src={product.image}
                       alt={product.name}
                       className={styles.productImage}
                       onError={(e) => {
                         e.target.src =
-                          "https://via.placeholder.com/60x60?text=?";
+                          "https://via.placeholder.com/70x70?text=?";
                       }}
                     />
 
@@ -254,7 +264,9 @@ const Scanner = () => {
 
                     <div className={styles.productQuantity}>
                       <button
-                        onClick={() => updateQuantity(product.id, -1)}
+                        onClick={() =>
+                          handleUpdateQuantity(product.barcode, -1)
+                        }
                         className={styles.quantityBtn}
                         disabled={product.quantity <= 1}
                       >
@@ -266,14 +278,14 @@ const Scanner = () => {
                       </span>
 
                       <button
-                        onClick={() => updateQuantity(product.id, 1)}
+                        onClick={() => handleUpdateQuantity(product.barcode, 1)}
                         className={styles.quantityBtn}
                       >
                         <Plus size={16} />
                       </button>
 
                       <button
-                        onClick={() => removeProduct(product.id)}
+                        onClick={() => handleRemoveProduct(product.barcode)}
                         className={styles.removeBtn}
                       >
                         <X size={16} />
