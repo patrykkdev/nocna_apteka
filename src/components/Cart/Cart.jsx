@@ -3,11 +3,7 @@ import { useCart } from "../../contexts/CartContext";
 import { getProductByCode } from "../../utils/products";
 import styles from "./Cart.module.css";
 
-const Cart = ({
-  title = "Koszyk",
-  canProceedCart = false,
-  onProceedToCheckout,
-}) => {
+const Cart = ({ title = "Koszyk", canProceedCart = false }) => {
   // hooks
   const {
     cart,
@@ -65,12 +61,6 @@ const Cart = ({
       updateQuantity(barcode, item.quantity - 1);
     } else if (item) {
       removeFromCart(barcode);
-    }
-  };
-
-  const handleProceedToCheckout = () => {
-    if (onProceedToCheckout) {
-      onProceedToCheckout();
     }
   };
 
@@ -142,12 +132,7 @@ const Cart = ({
 
         {canProceedCart && cart.length > 0 && (
           <div className={styles.cartFooter}>
-            <button
-              className={styles.proceedCartBtn}
-              onClick={handleProceedToCheckout}
-            >
-              Finalizuj koszyk
-            </button>
+            <button className={styles.proceedCartBtn}>Finalizuj koszyk</button>
             <div className={styles.totalPrice}>
               <span>Razem:</span>
               <span className={styles.totalAmount}>

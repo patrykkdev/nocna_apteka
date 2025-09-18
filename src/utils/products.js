@@ -2,7 +2,7 @@ const products = [
   {
     name: "Aspirin 500mg",
     price: 12.5,
-    barcode: "6935364021153",
+    barcode: "4752224002761",
     image:
       "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=200&h=200&fit=crop",
     description:
