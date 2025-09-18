@@ -180,10 +180,6 @@ const Products = () => {
               src={product.image}
               alt={product.name}
               className={styles.productImage}
-              onError={(e) => {
-                e.target.src =
-                  "https://via.placeholder.com/200x200?text=Brak+zdjęcia";
-              }}
             />
             <div className={styles.productInfo}>
               <h3 className={styles.productName}>{product.name}</h3>

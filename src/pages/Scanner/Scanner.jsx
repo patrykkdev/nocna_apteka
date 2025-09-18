@@ -28,9 +28,10 @@ const Scanner = () => {
     const handler = (e) => {
       if (e.key === "Enter") {
         if (buffer.trim().length > 0) {
-          performScan(buffer.trim());
+          setBuffer("");
+          // performScan(buffer.trim());
         }
-        setBuffer("");
+        // setBuffer("");
       } else if (e.key.length === 1) {
         // tylko znaki, bez Shift/Ctrl/Alt
         setBuffer((prev) => prev + e.key);
@@ -61,132 +62,6 @@ const Scanner = () => {
       setScannedProducts([]);
     }
   }, [cart]);
-
-  const performScan = async (barcode) => {
-    const now = Date.now();
-    if (now - lastScanTimeRef.current < 1000) {
-      return;
-    }
-    lastScanTimeRef.current = now;
-
-    setIsScanning(true);
-
-    try {
-      console.log("🔍 Szukam produktu dla kodu:", barcode);
-      console.log("📏 Długość kodu:", barcode.length);
-      console.log("🔢 Kod jako liczba:", parseInt(barcode));
-
-      const product = await getProductByBarcode(barcode.trim());
-
-      if (product) {
-        console.log("✅ Znaleziony produkt:", product);
-        await addToCart(product);
-        setLastScanned(product.name);
-
-        // Efekt wibracji na urządzeniach mobilnych
-        if (navigator.vibrate) {
-          navigator.vibrate(100);
-        }
-
-        // Efekt dźwiękowy
-        playBeepSound();
-
-        // Ukryj komunikat po 3 sekundach
-        setTimeout(() => setLastScanned(""), 3000);
-      } else {
-        console.log("❌ Nie znaleziono produktu dla kodu:", barcode);
-        showNotification(`Nie znaleziono produktu: ${barcode}`);
-
-        // Sprawdź czy to może być problem z formatem
-        console.log("🔍 Próbuję różnych formatów kodu...");
-        const variations = [
-          barcode.padStart(13, "0"), // EAN-13 z zerami na początku
-          barcode.replace(/^0+/, ""), // Usuń zera na początku
-          String(parseInt(barcode)), // Jako liczba bez zer wiodących
-        ];
-
-        for (const variation of variations) {
-          console.log("🔄 Sprawdzam wariant:", variation);
-          const variantProduct = await getProductByBarcode(variation);
-          if (variantProduct) {
-            console.log(
-              "✅ Znaleziony przez wariant:",
-              variation,
-              variantProduct
-            );
-            await addToCart(variantProduct);
-            setLastScanned(variantProduct.name);
-            playBeepSound();
-            setTimeout(() => setLastScanned(""), 3000);
-            return;
-          }
-        }
-
-        console.log("❌ Żaden wariant nie zadziałał");
-      }
-    } catch (error) {
-      console.error("💥 Błąd skanowania:", error);
-      showNotification("Błąd podczas skanowania");
-    } finally {
-      setBuffer("");
-      setIsScanning(false);
-    }
-  };
-
-  const playBeepSound = () => {
-    try {
-      const audioContext = new (window.AudioContext ||
-        window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-
-      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.1);
-    } catch (error) {
-      // Ignore audio errors
-    }
-  };
-
-  const handleUpdateQuantity = async (productBarcode, change) => {
-    const product = scannedProducts.find((p) => p.barcode === productBarcode);
-    if (!product) return;
-
-    if (change > 0) {
-      await addToCart(product);
-    } else {
-      const newQuantity = product.quantity - 1;
-      if (newQuantity > 0) {
-        await updateQuantity(productBarcode, newQuantity);
-      } else {
-        await removeFromCart(productBarcode);
-      }
-    }
-  };
-
-  const handleRemoveProduct = async (productBarcode) => {
-    await removeFromCart(productBarcode);
-  };
-
-  const handleCheckout = async () => {
-    if (scannedProducts.length === 0) return;
-
-    const totalPrice = getTotalPrice();
-    showNotification(
-      `Zamówienie na kwotę ${totalPrice.toFixed(2)} zł zostało złożone!`
-    );
-
-    // Tutaj dodaj logikę realizacji zamówienia
-    console.log("Realizacja zamówienia:", scannedProducts);
-
-    // Opcjonalnie wyczyść koszyk po złożeniu zamówienia
-    // await clearCart();
-  };
 
   return (
     <div className={styles.scannerPage}>
@@ -227,9 +102,9 @@ const Scanner = () => {
             />
             Produkty
           </h1>
-          <p className={styles.scannerSubtitle}>
+          {/* <p className={styles.scannerSubtitle}>
             Zeskanuj kod kreskowy produktu
-          </p>
+          </p> */}
         </div>
 
         <div className={styles.scannedProductsList}>
@@ -243,10 +118,6 @@ const Scanner = () => {
                       src={product.image}
                       alt={product.name}
                       className={styles.productImage}
-                      onError={(e) => {
-                        e.target.src =
-                          "https://via.placeholder.com/70x70?text=?";
-                      }}
                     />
 
                     <div className={styles.productInfo}>
@@ -264,9 +135,7 @@ const Scanner = () => {
 
                     <div className={styles.productQuantity}>
                       <button
-                        onClick={() =>
-                          handleUpdateQuantity(product.barcode, -1)
-                        }
+                        onClick={() => console.log("proceed checkout")}
                         className={styles.quantityBtn}
                         disabled={product.quantity <= 1}
                       >
@@ -278,14 +147,14 @@ const Scanner = () => {
                       </span>
 
                       <button
-                        onClick={() => handleUpdateQuantity(product.barcode, 1)}
+                        // onClick={() => handleUpdateQuantity(product.barcode, 1)}
                         className={styles.quantityBtn}
                       >
                         <Plus size={16} />
                       </button>
 
                       <button
-                        onClick={() => handleRemoveProduct(product.barcode)}
+                        // onClick={() => handleRemoveProduct(product.barcode)}
                         className={styles.removeBtn}
                       >
                         <X size={16} />
@@ -320,7 +189,7 @@ const Scanner = () => {
           </div>
 
           <button
-            onClick={handleCheckout}
+            // onClick={handleCheckout}
             className={styles.checkoutBtn}
             disabled={scannedProducts.length === 0}
           >

@@ -1,22 +1,45 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useCart } from "../../contexts/CartContext";
 import { getProductByCode } from "../../utils/products";
-import styles from "./Cart.module.css";
+import styles from "./Watch.module.css";
 
-const Cart = ({
-  title = "Koszyk",
-  canProceedCart = false,
-  onProceedToCheckout,
-}) => {
-  // hooks
-  const {
-    cart,
-    updateQuantity,
-    removeFromCart,
-    getTotalPrice,
-    getTotalItems,
-    addToCart,
-  } = useCart();
+const Watch = ({ title = "Lista Produktów" }) => {
+  // hooks - używamy tego samego co w Cart.jsx
+  const { cart, updateQuantity, removeFromCart, addToCart } = useCart();
+
+  // Debug - sprawdź co jest w koszyku
+  console.log("Watch - cart:", cart);
+
+  // Dodajmy przykładowe produkty na start (tylko do testowania)
+  useEffect(() => {
+    // Sprawdź czy koszyk jest pusty i dodaj przykładowe produkty
+    if (cart.length === 0) {
+      const sampleProducts = [
+        {
+          barcode: "123456789",
+          name: "Paracetamol 500mg",
+          price: 8.5,
+          image: "https://via.placeholder.com/32x32?text=P",
+        },
+        {
+          barcode: "987654321",
+          name: "Aspiryna 100mg",
+          price: 12.3,
+          image: "https://via.placeholder.com/32x32?text=A",
+        },
+        {
+          barcode: "555666777",
+          name: "Witamina C 1000mg",
+          price: 15.99,
+          image: "https://via.placeholder.com/32x32?text=C",
+        },
+      ];
+
+      sampleProducts.forEach((product) => {
+        addToCart(product);
+      });
+    }
+  }, []); // Uruchomi się tylko raz po zamontowaniu komponentu
 
   // refs
   const inputRef = useRef(null);
@@ -50,7 +73,7 @@ const Cart = ({
 
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [buffer]);
+  }, [buffer, addToCart]);
 
   const handleIncreaseQuantity = (barcode) => {
     const item = cart.find((item) => item.barcode === barcode);
@@ -68,32 +91,26 @@ const Cart = ({
     }
   };
 
-  const handleProceedToCheckout = () => {
-    if (onProceedToCheckout) {
-      onProceedToCheckout();
-    }
-  };
-
   return (
-    <div className={styles.cartWrapper}>
-      <div className={styles.cartContainer}>
-        <div className={styles.cartHeader}>
-          <div className={styles.cartTitle}>
+    <div className={styles.watchWrapper}>
+      <div className={styles.watchContainer}>
+        <div className={styles.watchHeader}>
+          <div className={styles.watchTitle}>
             <h2>{title}</h2>
           </div>
         </div>
 
-        <div className={styles.cartItems}>
+        <div className={styles.watchItems}>
           {cart.length === 0 ? (
-            <div className={styles.emptyCart}>
+            <div className={styles.emptyWatch}>
               <p>Koszyk jest pusty</p>
             </div>
           ) : (
             cart.map((item) => (
-              <div key={item.barcode} className={styles.cartItem}>
+              <div key={item.barcode} className={styles.watchItem}>
                 <img
                   src={
-                    item.image || "https://via.placeholder.com/60x60?text=Lek"
+                    item.image || "https://via.placeholder.com/32x32?text=Lek"
                   }
                   alt={item.name}
                   className={styles.itemImage}
@@ -101,9 +118,6 @@ const Cart = ({
 
                 <div className={styles.itemDetails}>
                   <span className={styles.itemName}>{item.name}</span>
-                  <span className={styles.itemPrice}>
-                    {item.price.toFixed(2)} zł
-                  </span>
                 </div>
 
                 <div className={styles.quantityControls}>
@@ -114,9 +128,7 @@ const Cart = ({
                     >
                       -
                     </button>
-                    <span className={styles.quantity}>
-                      ilość: {item.quantity}
-                    </span>
+                    <span className={styles.quantity}>{item.quantity}</span>
                     <button
                       className={`${styles.quantityBtn} ${styles.increaseBtn}`}
                       onClick={() => handleIncreaseQuantity(item.barcode)}
@@ -126,9 +138,6 @@ const Cart = ({
                   </div>
                 </div>
 
-                <div className={styles.itemTotal}>
-                  {(item.price * item.quantity).toFixed(2)} zł
-                </div>
                 <button
                   className={`${styles.quantityBtn} ${styles.removeBtn}`}
                   onClick={() => removeFromCart(item.barcode)}
@@ -139,26 +148,17 @@ const Cart = ({
             ))
           )}
         </div>
-
-        {canProceedCart && cart.length > 0 && (
-          <div className={styles.cartFooter}>
-            <button
-              className={styles.proceedCartBtn}
-              onClick={handleProceedToCheckout}
-            >
-              Finalizuj koszyk
-            </button>
-            <div className={styles.totalPrice}>
-              <span>Razem:</span>
-              <span className={styles.totalAmount}>
-                {getTotalPrice().toFixed(2)} zł
-              </span>
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Ukryty input do obsługi skanowania - taki sam jak w Cart.jsx */}
+      <input
+        ref={inputRef}
+        style={{ position: "absolute", left: "-9999px" }}
+        readOnly
+        value={buffer}
+      />
     </div>
   );
 };
 
-export default Cart;
+export default Watch;

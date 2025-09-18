@@ -28,6 +28,7 @@ export const subscribeToCart = (callback) => {
 
 // Aktualizuj koszyk w Firebase
 export const updateCart = async (cartItems) => {
+  console.log("Updating cart:", cartItems);
   try {
     const cartRef = doc(db, "cart", CART_DOC_ID);
     await updateDoc(cartRef, {

@@ -24,6 +24,7 @@ export const CartProvider = ({ children }) => {
     const loadInitialCart = async () => {
       try {
         const currentCart = await getCurrentCart();
+        console.log("Initial cart:", currentCart);
         setCart(currentCart);
       } catch (error) {
         console.error("Błąd ładowania koszyka:", error);
@@ -52,10 +53,12 @@ export const CartProvider = ({ children }) => {
   };
 
   const addToCart = async (product) => {
+    console.log("Adding to cart:", product);
     try {
       const existingItem = cart.find(
         (item) => item.barcode === product.barcode
       );
+      console.log("Existing item:", existingItem);
       let newCart;
 
       if (existingItem) {
@@ -67,6 +70,7 @@ export const CartProvider = ({ children }) => {
       } else {
         newCart = [...cart, { ...product, quantity: 1 }];
       }
+      console.log("New cart:", newCart);
 
       await updateCart(newCart);
       showNotification(`Dodano: ${product.name}`);
