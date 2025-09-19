@@ -12,6 +12,7 @@ const Cart = ({ title = "Koszyk", canProceedCart = false }) => {
     getTotalPrice,
     getTotalItems,
     addToCart,
+    finalizeOrder, // Nowa funkcja
   } = useCart();
 
   // refs
@@ -64,8 +65,25 @@ const Cart = ({ title = "Koszyk", canProceedCart = false }) => {
     }
   };
 
+  const handleFinalizeOrder = () => {
+    finalizeOrder();
+  };
+
   return (
     <div className={styles.cartWrapper}>
+      <div className={styles.videoConainer}>
+        {/* <div className={styles.cartTitle}>
+          <h2>Podgląd z kamerki</h2>
+        </div> */}
+        <div className={styles.videoWrapper}>
+          <img
+            src="http://192.168.88.200/mjpg/video.mjpg"
+            alt="Kamera"
+            className={styles.video}
+          />
+        </div>
+      </div>
+
       <div className={styles.cartContainer}>
         <div className={styles.cartHeader}>
           <div className={styles.cartTitle}>
@@ -132,7 +150,12 @@ const Cart = ({ title = "Koszyk", canProceedCart = false }) => {
 
         {canProceedCart && cart.length > 0 && (
           <div className={styles.cartFooter}>
-            <button className={styles.proceedCartBtn}>Finalizuj koszyk</button>
+            <button
+              className={styles.proceedCartBtn}
+              onClick={handleFinalizeOrder}
+            >
+              Finalizuj koszyk
+            </button>
             <div className={styles.totalPrice}>
               <span>Razem:</span>
               <span className={styles.totalAmount}>

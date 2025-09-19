@@ -4,6 +4,11 @@ import {
   updateCart,
   getCurrentCart,
 } from "../services/cartService";
+import {
+  subscribeToPayment,
+  setPaymentStatus,
+} from "../services/paymentService";
+
 const CartContext = createContext();
 
 export const useCart = () => {
@@ -18,6 +23,9 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [notification, setNotification] = useState("");
   const [loading, setLoading] = useState(true);
+  const [paymentStatus, setPaymentStatusState] = useState({
+    show_payment: false,
+  });
 
   // Załaduj początkowy koszyk
   useEffect(() => {
@@ -46,6 +54,20 @@ export const CartProvider = ({ children }) => {
 
     return unsubscribe;
   }, [loading]);
+
+  // Subskrybuj zmiany statusu płatności
+  useEffect(() => {
+    console.log("🔗 Setting up payment subscription");
+    const unsubscribe = subscribeToPayment((newPaymentStatus) => {
+      console.log("💳 Payment status update received:", newPaymentStatus);
+      setPaymentStatusState(newPaymentStatus);
+    });
+
+    return () => {
+      console.log("🔗 Cleaning up payment subscription");
+      unsubscribe();
+    };
+  }, []);
 
   const showNotification = (message) => {
     setNotification(message);
@@ -109,13 +131,34 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const clearCart = async () => {
+  const clearCart = async (showNotificationMsg = true) => {
     try {
       await updateCart([]);
-      showNotification("Koszyk został wyczyszczony");
+      if (showNotificationMsg) {
+        showNotification("Koszyk został wyczyszczony");
+      }
     } catch (error) {
       console.error("Błąd czyszczenia koszyka:", error);
-      showNotification("Błąd czyszczenia koszyka");
+      if (showNotificationMsg) {
+        showNotification("Błąd czyszczenia koszyka");
+      }
+    }
+  };
+
+  const finalizeOrder = async () => {
+    try {
+      if (cart.length === 0) {
+        showNotification("Koszyk jest pusty");
+        return;
+      }
+
+      console.log("🛒 Finalizing order - setting payment status to true");
+      // Ustaw status płatności na true
+      await setPaymentStatus(true);
+      showNotification("Płatność została zainicjowana!");
+    } catch (error) {
+      console.error("❌ Błąd finalizacji zamówienia:", error);
+      showNotification("Błąd finalizacji zamówienia");
     }
   };
 
@@ -131,10 +174,12 @@ export const CartProvider = ({ children }) => {
     cart,
     notification,
     loading,
+    paymentStatus,
     addToCart,
     updateQuantity,
     removeFromCart,
     clearCart,
+    finalizeOrder,
     getTotalPrice,
     getTotalItems,
     showNotification,
